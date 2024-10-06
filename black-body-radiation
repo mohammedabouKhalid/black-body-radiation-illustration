@@ -1,0 +1,70 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Constants
+h = 6.626e-34  # Planck's constant (J·s)
+c = 3e8  # Speed of light (m/s)
+k = 1.38e-23  # Boltzmann's constant (J/K)
+
+
+# Planck's law function for radiated power density
+def planck_law(wavelength, T):
+    """
+    Calculates the spectral radiance (W/m^3) for a black-body at temperature T (Kelvin)
+    and wavelength (meters).
+
+    Parameters:
+    wavelength: np.array, wavelengths in meters
+    T: float, temperature in Kelvin
+
+    Returns:
+    Spectral radiance in W/m^3
+    """
+    # Spectral radiance (W/m^3)
+    spectral_radiance = (2 * np.pi * h * c ** 2) / (wavelength ** 5) * (
+                1 / (np.exp((h * c) / (wavelength * k * T)) - 1))
+    return spectral_radiance
+
+
+# Wavelengths (nm)
+wavelengths_nm = np.linspace(100, 3000, 500)  # Wavelengths from 100 nm to 3000 nm
+wavelengths_m = wavelengths_nm * 1e-9  # Convert to meters
+
+# Temperatures (K)
+T1 = 1000  # Temperature 1: 1000 K
+T2 = 2000  # Temperature 2: 2000 K
+
+# Calculate spectral radiance for both temperatures
+radiance_T1 = planck_law(wavelengths_m, T1)
+radiance_T2 = planck_law(wavelengths_m, T2)
+
+# Wien's displacement law to find peak wavelength
+b = 2.897e-3  # Wien's constant (m·K)
+lambda_max_T1 = b / T1  # Peak wavelength for T1 (1000 K)
+lambda_max_T2 = b / T2  # Peak wavelength for T2 (2000 K)
+
+# Plotting the curves
+plt.figure(figsize=(10, 7))
+
+plt.plot(wavelengths_nm, radiance_T1, label=f'{T1}K', color='blue')
+plt.plot(wavelengths_nm, radiance_T2, label=f'{T2}K', color='orange')
+
+# Annotating Wien's displacement law (peak wavelength)
+plt.axvline(lambda_max_T1 * 1e9, color='blue', linestyle='--',
+            label=f'Peak at {round(lambda_max_T1 * 1e9, 1)} nm for {T1}K')
+plt.axvline(lambda_max_T2 * 1e9, color='orange', linestyle='--',
+            label=f'Peak at {round(lambda_max_T2 * 1e9, 1)} nm for {T2}K')
+
+# Adding labels and customizing the plot
+plt.xlabel('Wavelength (nm)')
+plt.ylabel('Spectral Radiance (W/m^3)')
+plt.title('Black-body Radiation Curves for 1000K and 2000K')
+plt.legend()
+plt.grid(True)
+
+# Highlighting the visible spectrum
+plt.axvspan(400, 700, color='red', alpha=0.3, label='Visible Spectrum (400-700 nm)')
+
+# Show plot
+plt.legend()
+plt.show()
